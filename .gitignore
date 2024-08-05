@@ -116,6 +116,9 @@ dist
 # DynamoDB Local files
 .dynamodb/
 
+# Docker
+docker-compose.db.yml
+
 # TernJS port file
 .tern-port
 
