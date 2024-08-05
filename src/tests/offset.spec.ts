@@ -54,7 +54,7 @@ describe("Offset", async () => {
     })
 
     it("Should be able to return an `array` of objects having the `type` according to the caller", async () => {
-        const { result:  userResult } = await prisma.user.paginate({
+        const { result: userResult } = await prisma.user.paginate({
             offset: {
                 page: 1,
                 perPage: 10
@@ -63,7 +63,7 @@ describe("Offset", async () => {
 
         expectTypeOf(userResult[0]).toEqualTypeOf<User>()
 
-        const { result:  postResult } = await prisma.post.paginate({
+        const { result: postResult } = await prisma.post.paginate({
             offset: {
                 page: 1,
                 perPage: 10
@@ -128,7 +128,7 @@ describe("Offset", async () => {
             offset: {
                 page: 1,
                 perPage: 20
-            }, 
+            },
             select: {
                 id: true
             }
@@ -157,7 +157,7 @@ describe("Offset", async () => {
         expect(meta).toEqual(expect.objectContaining({
             totalCount: numberOfInserts,
             pageCount: perPage,
-            totalPages: Math.ceil(numberOfInserts/perPage),
+            totalPages: Math.ceil(numberOfInserts / perPage),
             currentPage: page,
             previousPage: null,
             nextPage: page + 1
@@ -199,20 +199,20 @@ describe("Offset", async () => {
 
     it("Should not be possible to paginate items if the 'perPage' argument is not a number or undefined", async () => {
         await expect(() => prisma.user.paginate({
-                offset: {
-                    // @ts-ignore
-                    perPage: "1",
-                }   
+            offset: {
+                // @ts-ignore
+                perPage: "1",
             }
+        }
         )).rejects.toBeInstanceOf(PrismaClientValidationError)
     })
 
     it("Should not be possible to paginate items if the 'perPage' argument is not a valid number", async () => {
         await expect(() => prisma.user.paginate({
-                offset: {
-                    perPage: Number.MAX_SAFE_INTEGER + 1,
-                }   
+            offset: {
+                perPage: Number.MAX_SAFE_INTEGER + 1,
             }
+        }
         )).rejects.toBeInstanceOf(PrismaClientValidationError)
     })
 
