@@ -1,13 +1,13 @@
 import { Prisma } from "@prisma/client"
-import { findManyResult, paginateArgs } from "./types"
+import { cursorPaginate, cursorPaginateArgs, findManyResult, paginateArgs } from "./types"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
 
-export async function cursor<T, A extends paginateArgs<T>>(
+export async function cursor<T, A extends cursorPaginateArgs<T>>(
     model: T,
     args: A
 ): Promise<cursorResult<T, A>> {
     const context = Prisma.getExtensionContext(model)
-    const { cursor, ...findManyOptions } = args
+    let { cursor, ...findManyOptions } = args
     const {
         after,
         before,
@@ -18,12 +18,12 @@ export async function cursor<T, A extends paginateArgs<T>>(
             }
         },
         getCursor = (target) => {
-            if ("id" in (target as any)) {
+            if (target && "id" in (target as any)) {
                 return (target as any).id
             }
             throw new Error("The query must return an 'id' field to perform the cursor conversion.")
         }
-    } = cursor!
+    } = cursor
     if (after && before) {
         const clientVersion = Prisma.prismaVersion.client
         throw new PrismaClientValidationError(
@@ -31,13 +31,17 @@ export async function cursor<T, A extends paginateArgs<T>>(
             { clientVersion }
         )
     }
+    let take
 
     if (after) {
+        if (limit && limit !== -1) {
+            take = limit + 1
+        }
         let [result, previousPage] = await Promise.all([
             (context as any).findMany({
                 ...findManyOptions,
                 skip: 1,
-                take: limit ? limit + 1 : undefined,
+                take: take,
                 cursor: setCursor(after),
             }),
             (context as any).findMany({
@@ -68,11 +72,15 @@ export async function cursor<T, A extends paginateArgs<T>>(
     }
 
     if (before) {
+        if (limit && limit !== -1) {
+            take = -limit - 1
+        }
+
         let [result, nextPage] = await Promise.all([
             (context as any).findMany({
                 ...findManyOptions,
                 skip: 1,
-                take: limit ? -limit - 1 : undefined,
+                take: take,
                 cursor: setCursor(before),
             }),
             (context as any).findMany({
@@ -102,14 +110,17 @@ export async function cursor<T, A extends paginateArgs<T>>(
         }
     }
 
+    if (limit && limit > 0) {
+        take = limit + 1
+    }
     let [result] = await Promise.all([
         (context as any).findMany({
             ...findManyOptions,
-            take: limit ? limit + 1 : undefined,
+            take: take,
         }),
     ])
 
-    let hasNextPage = limit !== undefined && result.length > limit
+    let hasNextPage = limit! > 0 && result.length > limit!
     if (hasNextPage) {
         result.pop()
     }

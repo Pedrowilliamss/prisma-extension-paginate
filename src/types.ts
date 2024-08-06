@@ -16,14 +16,32 @@ type offsetPaginate = {
   perPage?: number
 }
 
-type cursorPaginate = {
+export type cursorPaginate = {
   limit?: number
-  setCursor?: <C>(cursor: string | number) => C
-  getCursor?: <T>(target: T) => string | number
+  setCursor?: SetCursor
+  getCursor?: GetCursor
 } & Exclusive<{ before?: string | number }, { after?: string | number }>
+
+export interface PaginateOptions {
+  offset: {
+    perPage: number
+  },
+  cursor: {
+    limit?: number
+    setCursor?: SetCursor,
+    getCursor?: GetCursor
+  }
+}
+
+type SetCursor = (cursor: string | number) => unknown
+type GetCursor = (target: unknown) => string | number
 
 export type PaginateResult<T, A> = A extends { cursor: cursorPaginate } ? cursorResult<T, A> : offsetResult<T, A>
 
-export type paginateArgs<T> = findManyArgsOmited<T> & Exclusive<{ offset: offsetPaginate }, { cursor: cursorPaginate }>
+export type paginateArgs<T> = findManyArgsOmited<T> & Exclusive<{ offset: offsetPaginate | true }, { cursor: cursorPaginate | true }>
+
+export type cursorPaginateArgs<T> = findManyArgsOmited<T> & { cursor: cursorPaginate }
+
+export type offsetPaginateArgs<T> = findManyArgsOmited<T> & { offset: offsetPaginate }
 
 export type findManyResult<T, A> = Prisma.Result<T, A, "findMany">

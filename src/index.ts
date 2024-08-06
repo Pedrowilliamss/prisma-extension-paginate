@@ -1,38 +1,53 @@
-import { Prisma } from "@prisma/client";
-import { paginateArgs, PaginateResult } from "./types";
-import { offset } from "./offset";
-import { cursor } from "./cursor";
+import { Prisma } from "@prisma/client"
+import { cursorPaginateArgs, offsetPaginateArgs, paginateArgs, PaginateOptions, PaginateResult } from "./types"
+import { offset } from "./offset"
+import { cursor } from "./cursor"
+import { PrismaClientValidationError } from "@prisma/client/runtime/library"
 
-export default (options?: paginateOptions) => {
+let defaultArgs: Partial<PaginateOptions> | undefined
+export default (options?: Partial<PaginateOptions>) => {
+    defaultArgs = options
+
     return Prisma.defineExtension((client) => {
         return client.$extends({
-            name: "pagianate",
+            name: "paginate",
             model: {
                 $allModels: {
-                    paginate: paginate
+                    paginate,
                 }
             }
-        })  
+        })
     })
-} 
+}
 
 async function paginate<T, A extends paginateArgs<T>>(
-    this: T, 
+    this: T,
     args: A,
-): Promise<PaginateResult<T,A>> {
+): Promise<PaginateResult<T, A>> {
     if ("offset" in args) {
-        return offset(this,args) as unknown as PaginateResult<T,A>
+        if (typeof args.offset !== "object") {
+            args.offset = {}
+        }
+
+        args.offset.perPage = args.offset?.perPage ?? defaultArgs?.offset?.perPage
+        return offset(this, args as offsetPaginateArgs<T>) as unknown as PaginateResult<T, A>
     }
 
     if ("cursor" in args) {
-        return cursor(this,args) as unknown as PaginateResult<T,A>
+        if (typeof args.cursor !== "object") {
+            args.cursor = {}
+        }
+
+        args.cursor.limit = args.cursor.limit ?? defaultArgs?.cursor?.limit
+        args.cursor.getCursor = args.cursor.getCursor ?? defaultArgs?.cursor?.getCursor
+        args.cursor.setCursor = args.cursor.setCursor ?? defaultArgs?.cursor?.setCursor
+
+        return cursor(this, args as cursorPaginateArgs<T>) as unknown as PaginateResult<T, A>
     }
-    
-    throw new Error() // TODO: Especifi a prismaValidationError
+
+    const clientVersion = Prisma.prismaVersion.client
+    throw new PrismaClientValidationError(
+        `Unable to use paginate without 'offset' or 'cursor'`,
+        { clientVersion }
+    )
 }
-
-
-interface paginateOptions {
-    pageSize?: number
-}
-

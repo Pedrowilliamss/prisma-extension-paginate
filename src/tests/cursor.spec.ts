@@ -1,12 +1,14 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it } from "vitest"
 import setup from "./utils/setup-tests"
 import teardown from "./utils/teardown-tests"
+import prismaPaginateExtension from "../index"
 import { randomInt } from "crypto"
+import { LIMIT } from "@/lib/constants"
 import { prisma } from "@/lib/prisma"
-import { User } from "@prisma/client"
+import { User, PrismaClient } from "@prisma/client"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
 
-let numberOfInserts = randomInt(6, 37)
+let numberOfInserts = randomInt(5, 37)
 
 describe("Cursor", async () => {
     beforeEach(async () => {
@@ -53,6 +55,100 @@ describe("Cursor", async () => {
         expect(meta).toHaveProperty('endCursor')
         expect(meta).toHaveProperty('hasPreviousPage')
         expect(meta).toHaveProperty('hasNextPage')
+    })
+
+    it("Should be able use default options", async () => {
+        const prismaWithDefaultOptions = new PrismaClient().$extends(
+            prismaPaginateExtension({
+                cursor: {
+                    limit: LIMIT,
+                    getCursor: (target) => { return (target as any).id },
+                    setCursor: (cursor) => { return { id: cursor } }
+                }
+            })
+        )
+
+        const { result, meta } = await prismaWithDefaultOptions.user.paginate({
+            cursor: true
+        })
+
+        const expectedResult = await prisma.user.findMany({
+            take: LIMIT
+        })
+
+        expect(result).toStrictEqual(expectedResult)
+        expect(meta).toStrictEqual({
+            hasPreviousPage: false,
+            hasNextPage: true,
+            startCursor: expectedResult[0].id,
+            endCursor: expectedResult[expectedResult.length - 1].id,
+        })
+    })
+
+    it("Should be able use custom get and set cursor", async () => {
+        let limit = 5
+        const { email } = await prisma.user.findFirstOrThrow({
+            orderBy: {
+                email: "asc"
+            }
+        })
+
+        const { result, meta } = await prisma.user.paginate({
+            cursor: {
+                setCursor(cursor) {
+                    return { email: cursor }
+                },
+                getCursor(target) {
+                    return (target as any).email
+                },
+                after: email,
+                limit: limit
+            },
+            orderBy: {
+                email: "asc"
+            }
+        })
+
+        const expectedResults = await prisma.user.findMany({
+            cursor: {
+                email: email
+            },
+            skip: 1,
+            take: limit,
+            orderBy: {
+                email: "asc"
+            }
+        })
+
+        expect(result.length).toStrictEqual(expectedResults.length)
+        expect(meta).toStrictEqual({
+            hasPreviousPage: false,
+            hasNextPage: true,
+            startCursor: expectedResults[0].email,
+            endCursor: expectedResults[expectedResults.length - 1].email,
+        })
+    })
+
+    it("Should be able to return all results if `offsert.perPage` is -1, even if there is a default value", async () => {
+        const prismaWithDefaultOptions = new PrismaClient().$extends(
+            prismaPaginateExtension({
+                cursor: {
+                    limit: LIMIT
+                }
+            })
+        )
+
+        const { result, meta } = await prismaWithDefaultOptions.user.paginate({
+            cursor: {
+                limit: -1
+            }
+        })
+
+        expect(result).toHaveLength(numberOfInserts)
+        expect(meta).toEqual(expect.objectContaining({
+            hasPreviousPage: false,
+            hasNextPage: false,
+        }))
     })
 
     it("Should be able to return the typed result according to the arguments", async () => {

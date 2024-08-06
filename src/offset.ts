@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
-import { findManyResult, paginateArgs } from "./types"
+import { findManyResult, offsetPaginateArgs, paginateArgs } from "./types"
 
 type offsetMeta = {
     totalCount: number
@@ -11,21 +11,21 @@ type offsetMeta = {
     nextPage: number | null
 }
 
-export type offsetResult<T,A> = {
-    result: findManyResult<T,A>
+export type offsetResult<T, A> = {
+    result: findManyResult<T, A>
     meta: offsetMeta
 }
 
-export async function offset<T, A extends paginateArgs<T>>(
-    model: T, 
-    args: A, 
+export async function offset<T, A extends offsetPaginateArgs<T>>(
+    model: T,
+    args: A,
 ): Promise<offsetResult<T, A>> {
     const context = Prisma.getExtensionContext(model)
-    const {offset, ...findManyOptions} = args
+    const { offset, ...findManyOptions } = args
 
-    let { page = 1, perPage } = offset!
+    let { page = 1, perPage } = offset
 
-    if (typeof page !== "number") { 
+    if (typeof page !== "number") {
         const clientVersion = Prisma.prismaVersion.client
         throw new PrismaClientValidationError(
             `Argument page: Invalid value provided. Expected Int, provided ${typeof page}`,
@@ -49,26 +49,31 @@ export async function offset<T, A extends paginateArgs<T>>(
         )
     }
 
-    let result, totalCount
+    let result, totalCount, skip, take
+
+    if (perPage && perPage !== -1) {
+        skip = (page - 1) * perPage
+        take = perPage
+    }
 
     [result, totalCount] = await Promise.all([
         (context as any).findMany({
             ...findManyOptions,
-            skip: perPage ? (page - 1) * perPage : undefined,
-            take: perPage,
+            skip: skip,
+            take: take,
         }),
         (context as any).count({
             where: args.where,
         }),
     ])
 
-    const meta = generateMetaPaginate({totalCount, page, perPage, pageCount: result.length})
+    const meta = generateMetaPaginate({ totalCount, page, perPage, pageCount: result.length })
 
     return {
         result,
         meta
     }
-}  
+}
 
 type generateMetaPaginateParams = {
     totalCount: number
@@ -81,13 +86,13 @@ function generateMetaPaginate({ page, pageCount, perPage, totalCount }: generate
     perPage = perPage ?? totalCount
     let totalPages = Math.ceil(totalCount / perPage) || 1
     const currentPage = Math.min(page ?? 1, totalPages)
-    const previousPage = currentPage > 1 ? currentPage -1 : null
+    const previousPage = currentPage > 1 ? currentPage - 1 : null
     const nextPage = currentPage < totalPages ? currentPage + 1 : null
 
     return {
         totalCount,
         pageCount,
-        totalPages, 
+        totalPages,
         currentPage,
         previousPage,
         nextPage
