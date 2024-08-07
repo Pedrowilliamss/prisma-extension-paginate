@@ -12,7 +12,7 @@ type offsetMeta = {
 }
 
 export type offsetResult<T, A> = {
-    result: findManyResult<T, A>
+    data: findManyResult<T, A>
     meta: offsetMeta
 }
 
@@ -49,14 +49,14 @@ export async function offset<T, A extends offsetPaginateArgs<T>>(
         )
     }
 
-    let result, totalCount, skip, take
+    let data, totalCount, skip, take
 
     if (perPage && perPage !== -1) {
         skip = (page - 1) * perPage
         take = perPage
     }
 
-    [result, totalCount] = await Promise.all([
+    [data, totalCount] = await Promise.all([
         (context as any).findMany({
             ...findManyOptions,
             skip: skip,
@@ -67,10 +67,10 @@ export async function offset<T, A extends offsetPaginateArgs<T>>(
         }),
     ])
 
-    const meta = generateMetaPaginate({ totalCount, page, perPage, pageCount: result.length })
+    const meta = generateMetaPaginate({ totalCount, page, perPage, pageCount: data.length })
 
     return {
-        result,
+        data,
         meta
     }
 }

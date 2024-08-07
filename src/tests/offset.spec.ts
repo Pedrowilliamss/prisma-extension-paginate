@@ -20,7 +20,7 @@ describe("Offset", async () => {
     })
 
     it("Should be able to paginate", async () => {
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             offset: {
                 page: 1,
                 perPage: 10
@@ -30,7 +30,7 @@ describe("Offset", async () => {
             }
         })
 
-        expect(result).toHaveLength(meta.pageCount)
+        expect(data).toHaveLength(meta.pageCount)
     })
 
     it("Should be able to paginate with query", async () => {
@@ -42,7 +42,7 @@ describe("Offset", async () => {
             }
         })
 
-        const { result } = await prisma.user.paginate({
+        const { data } = await prisma.user.paginate({
             where: {
                 email: newUser.email
             },
@@ -52,11 +52,11 @@ describe("Offset", async () => {
             },
         })
 
-        expect(result[0]).toEqual(expect.objectContaining(newUser))
+        expect(data[0]).toEqual(expect.objectContaining(newUser))
     })
 
     it("Should be able to return an `array` of objects having the `type` according to the caller", async () => {
-        const { result: userResult } = await prisma.user.paginate({
+        const { data: userResult } = await prisma.user.paginate({
             offset: {
                 page: 1,
                 perPage: 10
@@ -65,7 +65,7 @@ describe("Offset", async () => {
 
         expectTypeOf(userResult[0]).toEqualTypeOf<User>()
 
-        const { result: postResult } = await prisma.post.paginate({
+        const { data: postResult } = await prisma.post.paginate({
             offset: {
                 page: 1,
                 perPage: 10
@@ -75,9 +75,9 @@ describe("Offset", async () => {
         expectTypeOf(postResult[0]).toEqualTypeOf<Post>()
     })
 
-    it("Should be able to return the first page of results if `offser.page` is not provided", async () => {
+    it("Should be able to return the first page of data if `offser.page` is not provided", async () => {
         const perPage = Math.ceil(numberOfInserts / 2)
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             offset: {
                 perPage
             }
@@ -86,7 +86,7 @@ describe("Offset", async () => {
         const totalPage = Math.ceil(numberOfInserts / perPage)
         const nextPage = totalPage > 1 ? 2 : null
 
-        expect(result).toHaveLength(perPage)
+        expect(data).toHaveLength(perPage)
         expect(meta).toEqual(expect.objectContaining({
             totalCount: numberOfInserts,
             pageCount: perPage,
@@ -99,7 +99,7 @@ describe("Offset", async () => {
 
     it("Should always return the first page if 'page' is not specified", async () => {
         const perPage = Math.ceil(numberOfInserts / 2)
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             offset: {
                 perPage
             }
@@ -108,7 +108,7 @@ describe("Offset", async () => {
         const totalPage = Math.ceil(numberOfInserts / perPage)
         const nextPage = totalPage > 1 ? 2 : null
 
-        expect(result).toHaveLength(perPage)
+        expect(data).toHaveLength(perPage)
         expect(meta).toEqual(expect.objectContaining({
             totalCount: numberOfInserts,
             pageCount: perPage,
@@ -119,7 +119,7 @@ describe("Offset", async () => {
         }))
     })
 
-    it("Should be able to return all results if `offsert.perPage` is -1, even if there is a default value", async () => {
+    it("Should be able to return all data if `offsert.perPage` is -1, even if there is a default value", async () => {
         const prismaWithDefaultOptions = new PrismaClient().$extends(
             prismaPaginateExtension({
                 offset: {
@@ -128,24 +128,24 @@ describe("Offset", async () => {
             })
         )
         const perPage = -1
-        const { result } = await prismaWithDefaultOptions.user.paginate({
+        const { data } = await prismaWithDefaultOptions.user.paginate({
             offset: {
                 perPage
             }
         })
 
-        expect(result).toHaveLength(numberOfInserts)
+        expect(data).toHaveLength(numberOfInserts)
     })
 
-    it("Should be able to return all results if `offsert.perPage` is undefined and does not have a default value", async () => {
+    it("Should be able to return all data if `offsert.perPage` is undefined and does not have a default value", async () => {
         const prismaWithoutDefaultOptions = new PrismaClient().$extends(
             prismaPaginateExtension()
         )
-        const { result } = await prismaWithoutDefaultOptions.user.paginate({
+        const { data } = await prismaWithoutDefaultOptions.user.paginate({
             offset: {}
         })
 
-        expect(result).toHaveLength(numberOfInserts)
+        expect(data).toHaveLength(numberOfInserts)
     })
 
     it("Should be able to return a `meta` object with the correct pagination data", async () => {
@@ -180,7 +180,7 @@ describe("Offset", async () => {
     it("Should be able to return an empty array if it does not find the specified data.", async () => {
         const page = 1
         const perPage = 20
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             where: {
                 id: -1
             },
@@ -190,7 +190,7 @@ describe("Offset", async () => {
             }
         })
 
-        expect(result).toHaveLength(0)
+        expect(data).toHaveLength(0)
         expect(meta).toEqual(expect.objectContaining({
             totalCount: 0,
             pageCount: 0,
@@ -209,11 +209,11 @@ describe("Offset", async () => {
                 }
             })
         )
-        const { result, meta } = await prismaWithDefaultOptions.user.paginate({
+        const { data, meta } = await prismaWithDefaultOptions.user.paginate({
             offset: {}
         })
 
-        expect(result).toHaveLength(PER_PAGE)
+        expect(data).toHaveLength(PER_PAGE)
         expect(meta).toEqual(expect.objectContaining({
             pageCount: PER_PAGE,
             currentPage: 1,

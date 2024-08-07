@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client"
-import { cursorPaginate, cursorPaginateArgs, findManyResult, paginateArgs } from "./types"
+import { cursorPaginateArgs, findManyResult } from "./types"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
 
 export async function cursor<T, A extends cursorPaginateArgs<T>>(
@@ -37,7 +37,7 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
         if (limit && limit !== -1) {
             take = limit + 1
         }
-        let [result, previousPage] = await Promise.all([
+        let [data, previousPage] = await Promise.all([
             (context as any).findMany({
                 ...findManyOptions,
                 skip: 1,
@@ -55,18 +55,18 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
             }),
         ])
 
-        let hasNextPage = limit !== undefined && result.length > limit
+        let hasNextPage = limit !== undefined && data.length > limit
         if (hasNextPage) {
-            result.pop()
+            data.pop()
         }
 
         return {
-            result,
+            data,
             meta: {
                 hasPreviousPage: previousPage.length === 1,
                 hasNextPage: hasNextPage,
-                startCursor: getCursor(result[0]),
-                endCursor: getCursor(result[result.length - 1])
+                startCursor: getCursor(data[0]),
+                endCursor: getCursor(data[data.length - 1])
             }
         }
     }
@@ -76,7 +76,7 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
             take = -limit - 1
         }
 
-        let [result, nextPage] = await Promise.all([
+        let [data, nextPage] = await Promise.all([
             (context as any).findMany({
                 ...findManyOptions,
                 skip: 1,
@@ -94,18 +94,18 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
             }),
         ])
 
-        let hasPreviousPage = limit !== undefined && result.length > limit
+        let hasPreviousPage = limit !== undefined && data.length > limit
         if (hasPreviousPage) {
-            result.shift()
+            data.shift()
         }
 
         return {
-            result,
+            data,
             meta: {
                 hasPreviousPage: hasPreviousPage,
                 hasNextPage: nextPage.length === 1,
-                startCursor: getCursor(result[0]),
-                endCursor: getCursor(result[result.length - 1])
+                startCursor: getCursor(data[0]),
+                endCursor: getCursor(data[data.length - 1])
             }
         }
     }
@@ -113,25 +113,25 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
     if (limit && limit > 0) {
         take = limit + 1
     }
-    let [result] = await Promise.all([
+    let [data] = await Promise.all([
         (context as any).findMany({
             ...findManyOptions,
             take: take,
         }),
     ])
 
-    let hasNextPage = limit! > 0 && result.length > limit!
+    let hasNextPage = limit! > 0 && data.length > limit!
     if (hasNextPage) {
-        result.pop()
+        data.pop()
     }
 
     return {
-        result,
+        data,
         meta: {
             hasPreviousPage: false,
             hasNextPage: hasNextPage,
-            startCursor: getCursor(result[0]),
-            endCursor: getCursor(result[result.length - 1])
+            startCursor: getCursor(data[0]),
+            endCursor: getCursor(data[data.length - 1])
         }
     }
 }
@@ -144,6 +144,6 @@ type cursorMeta = {
 }
 
 export type cursorResult<T, A> = {
-    result: findManyResult<T, A>
+    data: findManyResult<T, A>
     meta: cursorMeta
 }

@@ -20,11 +20,11 @@ describe("Cursor", async () => {
     })
 
     it("Should be able to use cursor-based pagination", async () => {
-        const { result } = await prisma.user.paginate({
+        const { data } = await prisma.user.paginate({
             cursor: {}
         })
 
-        const target = result[0]
+        const target = data[0]
         expectTypeOf(target).toEqualTypeOf<User>()
 
         expect(target).toStrictEqual({
@@ -68,7 +68,7 @@ describe("Cursor", async () => {
             })
         )
 
-        const { result, meta } = await prismaWithDefaultOptions.user.paginate({
+        const { data, meta } = await prismaWithDefaultOptions.user.paginate({
             cursor: true
         })
 
@@ -76,7 +76,7 @@ describe("Cursor", async () => {
             take: LIMIT
         })
 
-        expect(result).toStrictEqual(expectedResult)
+        expect(data).toStrictEqual(expectedResult)
         expect(meta).toStrictEqual({
             hasPreviousPage: false,
             hasNextPage: true,
@@ -93,7 +93,7 @@ describe("Cursor", async () => {
             }
         })
 
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             cursor: {
                 setCursor(cursor) {
                     return { email: cursor }
@@ -120,7 +120,7 @@ describe("Cursor", async () => {
             }
         })
 
-        expect(result.length).toStrictEqual(expectedResults.length)
+        expect(data.length).toStrictEqual(expectedResults.length)
         expect(meta).toStrictEqual({
             hasPreviousPage: false,
             hasNextPage: true,
@@ -129,7 +129,7 @@ describe("Cursor", async () => {
         })
     })
 
-    it("Should be able to return all results if `offsert.perPage` is -1, even if there is a default value", async () => {
+    it("Should be able to return all data if `offsert.perPage` is -1, even if there is a default value", async () => {
         const prismaWithDefaultOptions = new PrismaClient().$extends(
             prismaPaginateExtension({
                 cursor: {
@@ -138,22 +138,22 @@ describe("Cursor", async () => {
             })
         )
 
-        const { result, meta } = await prismaWithDefaultOptions.user.paginate({
+        const { data, meta } = await prismaWithDefaultOptions.user.paginate({
             cursor: {
                 limit: -1
             }
         })
 
-        expect(result).toHaveLength(numberOfInserts)
+        expect(data).toHaveLength(numberOfInserts)
         expect(meta).toEqual(expect.objectContaining({
             hasPreviousPage: false,
             hasNextPage: false,
         }))
     })
 
-    it("Should be able to return the typed result according to the arguments", async () => {
+    it("Should be able to return the typed data according to the arguments", async () => {
         const limit = 1
-        const { result } = await prisma.user.paginate({
+        const { data } = await prisma.user.paginate({
             cursor: {
                 limit: limit
             },
@@ -168,14 +168,14 @@ describe("Cursor", async () => {
             },
         })
 
-        expectTypeOf(result[0]).toEqualTypeOf<{
+        expectTypeOf(data[0]).toEqualTypeOf<{
             id: number,
             name: string | null,
             posts: {
                 id: number
             }[],
         }>()
-        expect(result[0]).toStrictEqual({
+        expect(data[0]).toStrictEqual({
             id: expect.any(Number),
             name: expect.any(String),
             posts: expect.arrayContaining([{
@@ -186,7 +186,7 @@ describe("Cursor", async () => {
 
     it("Should be able to use cursor-based pagination using the 'limit' parameter", async () => {
         const limit = Math.ceil(numberOfInserts / 3)
-        const { result } = await prisma.user.paginate({
+        const { data } = await prisma.user.paginate({
             cursor: {
                 limit: limit
             },
@@ -196,24 +196,24 @@ describe("Cursor", async () => {
             take: limit
         })
 
-        expect(result).toStrictEqual(expectedResult)
+        expect(data).toStrictEqual(expectedResult)
     })
 
-    it("Should be able to use cursor to page through the first 'n' results", async () => {
+    it("Should be able to use cursor to page through the first 'n' data", async () => {
         const limit = Math.ceil(numberOfInserts / 3)
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             cursor: {
                 limit: limit
             }
         })
-        const { id: startCursor } = result[0]
-        const { id: endCurso } = result[limit - 1]
+        const { id: startCursor } = data[0]
+        const { id: endCurso } = data[limit - 1]
 
         const expectedResult = await prisma.user.findMany({
             take: limit
         })
 
-        expect(result).toStrictEqual(expectedResult)
+        expect(data).toStrictEqual(expectedResult)
 
         expect(meta).toStrictEqual({
             hasPreviousPage: false,
@@ -223,7 +223,7 @@ describe("Cursor", async () => {
         })
     })
 
-    it("Should be able to use cursor to page through the next 'n' results", async () => {
+    it("Should be able to use cursor to page through the next 'n' data", async () => {
         const limit = Math.ceil(numberOfInserts / 3)
 
         const { id: cursor } = await prisma.user.findFirstOrThrow({
@@ -241,14 +241,14 @@ describe("Cursor", async () => {
             skip: 1
         })
 
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             cursor: {
                 after: cursor,
                 limit: limit
             },
         })
 
-        expect(result).toStrictEqual(expectedResults)
+        expect(data).toStrictEqual(expectedResults)
         expect(meta).toStrictEqual({
             hasPreviousPage: true,
             hasNextPage: true,
@@ -257,7 +257,7 @@ describe("Cursor", async () => {
         })
     })
 
-    it("Should be able to use cursor to page through the previous 'n' results", async () => {
+    it("Should be able to use cursor to page through the previous 'n' data", async () => {
         const limit = Math.ceil(numberOfInserts / 3)
 
         const { id: cursor } = await prisma.user.findFirstOrThrow({
@@ -275,14 +275,14 @@ describe("Cursor", async () => {
             skip: 1
         })
 
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             cursor: {
                 before: cursor,
                 limit: limit
             },
         })
 
-        expect(result).toStrictEqual(expectedResults)
+        expect(data).toStrictEqual(expectedResults)
         expect(meta).toStrictEqual({
             hasPreviousPage: false,
             hasNextPage: true,
@@ -291,7 +291,7 @@ describe("Cursor", async () => {
         })
     })
 
-    it("Should be able to use cursor to page through the last 'n' results using 'after'", async () => {
+    it("Should be able to use cursor to page through the last 'n' data using 'after'", async () => {
         const totalPages = 3
         const limit = Math.ceil(numberOfInserts / totalPages)
 
@@ -310,14 +310,14 @@ describe("Cursor", async () => {
             skip: 1
         })
 
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             cursor: {
                 after: cursor,
                 limit: limit
             },
         })
 
-        expect(result).toStrictEqual(expectedResults)
+        expect(data).toStrictEqual(expectedResults)
         expect(meta).toStrictEqual({
             hasPreviousPage: true,
             hasNextPage: false,
@@ -326,7 +326,7 @@ describe("Cursor", async () => {
         })
     })
 
-    it("Should be able to use cursor to page through the last 'n' results using 'before'", async () => {
+    it("Should be able to use cursor to page through the last 'n' data using 'before'", async () => {
         const totalPages = 3
         const limit = Math.ceil(numberOfInserts / totalPages)
 
@@ -342,14 +342,14 @@ describe("Cursor", async () => {
             skip: 1
         })
 
-        const { result, meta } = await prisma.user.paginate({
+        const { data, meta } = await prisma.user.paginate({
             cursor: {
                 before: cursor,
                 limit: limit
             },
         })
 
-        expect(result).toStrictEqual(expectedResults)
+        expect(data).toStrictEqual(expectedResults)
         expect(meta).toStrictEqual({
             hasPreviousPage: true,
             hasNextPage: false,
