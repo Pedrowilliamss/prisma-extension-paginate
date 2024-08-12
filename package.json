@@ -1,9 +1,14 @@
 {
   "name": "prisma-extension-paginate",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "Prisma extension used to paginate queries performed by the Prisma client",
-  "main": "index.js",
+  "main": "build/index.js",
+  "types": "build/index.d.js",
+  "files": [
+    "build/"
+  ],
   "scripts": {
+    "build": "tsc",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
@@ -24,6 +29,7 @@
   },
   "homepage": "https://github.com/Pedrowilliamss/prisma-extension-paginate#readme",
   "devDependencies": {
+    "@prisma/client": "^5.18.0",
     "@types/node": "^22.0.0",
     "@vitest/coverage-v8": "^2.0.5",
     "prisma": "^5.17.0",
@@ -31,8 +37,5 @@
     "typescript": "^5.5.4",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^2.0.4"
-  },
-  "dependencies": {
-    "@prisma/client": "^5.17.0"
   }
 }
