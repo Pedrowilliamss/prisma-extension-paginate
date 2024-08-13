@@ -60,15 +60,16 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
             data.pop()
         }
 
-        return {
+
+        return [
             data,
-            meta: {
+            {
                 hasPreviousPage: previousPage.length === 1,
                 hasNextPage: hasNextPage,
                 startCursor: getCursor(data[0]),
                 endCursor: getCursor(data[data.length - 1])
             }
-        }
+        ]
     }
 
     if (before) {
@@ -99,15 +100,15 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
             data.shift()
         }
 
-        return {
+        return [
             data,
-            meta: {
+            {
                 hasPreviousPage: hasPreviousPage,
                 hasNextPage: nextPage.length === 1,
                 startCursor: getCursor(data[0]),
                 endCursor: getCursor(data[data.length - 1])
             }
-        }
+        ]
     }
 
     if (limit && limit > 0) {
@@ -125,13 +126,13 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
         data.pop()
     }
 
-    return {
+    return [
         data,
-        meta: {
+        {
             hasPreviousPage: false,
             hasNextPage: hasNextPage,
             startCursor: getCursor(data[0]),
             endCursor: getCursor(data[data.length - 1])
         }
-    }
+    ]
 }

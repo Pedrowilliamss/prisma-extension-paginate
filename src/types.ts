@@ -51,10 +51,10 @@ export type cursorMeta = {
   endCursor: string | number
 }
 
-export type cursorResult<T, A> = {
-  data: findManyResult<T, A>
+export type cursorResult<T, A> = [
+  data: findManyResult<T, A>,
   meta: cursorMeta
-}
+]
 
 export type offsetMeta = {
   totalCount: number
@@ -65,7 +65,7 @@ export type offsetMeta = {
   nextPage: number | null
 }
 
-export type offsetResult<T, A> = {
-  data: findManyResult<T, A>
+export type offsetResult<T, A> = [
+  data: findManyResult<T, A>,
   meta: offsetMeta
-}
+]

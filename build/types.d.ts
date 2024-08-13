@@ -51,10 +51,10 @@ export type cursorMeta = {
     startCursor: string | number;
     endCursor: string | number;
 };
-export type cursorResult<T, A> = {
-    data: findManyResult<T, A>;
-    meta: cursorMeta;
-};
+export type cursorResult<T, A> = [
+    data: findManyResult<T, A>,
+    meta: cursorMeta
+];
 export type offsetMeta = {
     totalCount: number;
     pageCount: number;
@@ -63,8 +63,8 @@ export type offsetMeta = {
     previousPage: number | null;
     nextPage: number | null;
 };
-export type offsetResult<T, A> = {
-    data: findManyResult<T, A>;
-    meta: offsetMeta;
-};
+export type offsetResult<T, A> = [
+    data: findManyResult<T, A>,
+    meta: offsetMeta
+];
 export {};

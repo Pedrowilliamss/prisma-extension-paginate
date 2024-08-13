@@ -20,7 +20,7 @@ describe("Offset", async () => {
     })
 
     it("Should be able to paginate", async () => {
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             offset: {
                 page: 1,
                 perPage: 10
@@ -42,7 +42,7 @@ describe("Offset", async () => {
             }
         })
 
-        const { data } = await prisma.user.paginate({
+        const [data] = await prisma.user.paginate({
             where: {
                 email: newUser.email
             },
@@ -56,7 +56,7 @@ describe("Offset", async () => {
     })
 
     it("Should be able to return an `array` of objects having the `type` according to the caller", async () => {
-        const { data: userResult } = await prisma.user.paginate({
+        const [userResult] = await prisma.user.paginate({
             offset: {
                 page: 1,
                 perPage: 10
@@ -65,7 +65,7 @@ describe("Offset", async () => {
 
         expectTypeOf(userResult[0]).toEqualTypeOf<User>()
 
-        const { data: postResult } = await prisma.post.paginate({
+        const [postResult] = await prisma.post.paginate({
             offset: {
                 page: 1,
                 perPage: 10
@@ -77,7 +77,7 @@ describe("Offset", async () => {
 
     it("Should be able to return the first page of data if `offser.page` is not provided", async () => {
         const perPage = Math.ceil(numberOfInserts / 2)
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             offset: {
                 perPage
             }
@@ -99,7 +99,7 @@ describe("Offset", async () => {
 
     it("Should always return the first page if 'page' is not specified", async () => {
         const perPage = Math.ceil(numberOfInserts / 2)
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             offset: {
                 perPage
             }
@@ -128,7 +128,7 @@ describe("Offset", async () => {
             })
         )
         const perPage = -1
-        const { data } = await prismaWithDefaultOptions.user.paginate({
+        const [data] = await prismaWithDefaultOptions.user.paginate({
             offset: {
                 perPage
             }
@@ -141,7 +141,7 @@ describe("Offset", async () => {
         const prismaWithoutDefaultOptions = new PrismaClient().$extends(
             prismaPaginateExtension()
         )
-        const { data } = await prismaWithoutDefaultOptions.user.paginate({
+        const [data] = await prismaWithoutDefaultOptions.user.paginate({
             offset: {}
         })
 
@@ -151,7 +151,7 @@ describe("Offset", async () => {
     it("Should be able to return a `meta` object with the correct pagination data", async () => {
         const page = 1
         const perPage = Math.ceil(numberOfInserts / 2)
-        const { meta } = await prisma.user.paginate({
+        const [_, meta] = await prisma.user.paginate({
             offset: {
                 page,
                 perPage
@@ -180,7 +180,7 @@ describe("Offset", async () => {
     it("Should be able to return an empty array if it does not find the specified data.", async () => {
         const page = 1
         const perPage = 20
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             where: {
                 id: -1
             },
@@ -209,7 +209,7 @@ describe("Offset", async () => {
                 }
             })
         )
-        const { data, meta } = await prismaWithDefaultOptions.user.paginate({
+        const [data, meta] = await prismaWithDefaultOptions.user.paginate({
             offset: {}
         })
 
@@ -259,7 +259,7 @@ describe("Offset", async () => {
         const numberOfPages = 3
         const page = 1
         const perPage = Math.ceil(numberOfInserts / numberOfPages) // 3 pages
-        const { meta } = await prisma.user.paginate({
+        const [_, meta] = await prisma.user.paginate({
             offset: {
                 page,
                 perPage
@@ -281,7 +281,7 @@ describe("Offset", async () => {
         const page = numberOfPages
         const perPage = Math.ceil(numberOfInserts / numberOfPages)
 
-        const { meta } = await prisma.user.paginate({
+        const [_, meta] = await prisma.user.paginate({
             offset: {
                 page,
                 perPage
@@ -302,7 +302,7 @@ describe("Offset", async () => {
         const numberOfPages = 3
         const page = 2
         const perPage = Math.ceil(numberOfInserts / numberOfPages)
-        const { meta } = await prisma.user.paginate({
+        const [_, meta] = await prisma.user.paginate({
             offset: {
                 page,
                 perPage
@@ -323,7 +323,7 @@ describe("Offset", async () => {
         const numberOfPages = 1
         const page = 1
         const perPage = Math.ceil(numberOfInserts / numberOfPages)
-        const { meta } = await prisma.user.paginate({
+        const [_, meta] = await prisma.user.paginate({
             offset: {
                 page,
                 perPage

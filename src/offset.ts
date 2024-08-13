@@ -55,10 +55,10 @@ export async function offset<T, A extends offsetPaginateArgs<T>>(
 
     const meta = generateMetaPaginate({ totalCount, page, perPage, pageCount: data.length })
 
-    return {
+    return [
         data,
         meta
-    }
+    ]
 }
 
 type generateMetaPaginateParams = {

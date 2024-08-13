@@ -20,7 +20,7 @@ describe("Cursor", async () => {
     })
 
     it("Should be able to use cursor-based pagination", async () => {
-        const { data } = await prisma.user.paginate({
+        const [data] = await prisma.user.paginate({
             cursor: {}
         })
 
@@ -37,7 +37,7 @@ describe("Cursor", async () => {
 
     it("Should be able to get the metadata from cursor-based pagination", async () => {
         const { id: cursor } = await prisma.user.findFirstOrThrow()
-        const { meta } = await prisma.user.paginate({
+        const [_, meta] = await prisma.user.paginate({
             cursor: {
                 after: cursor,
                 limit: 10
@@ -68,7 +68,7 @@ describe("Cursor", async () => {
             })
         )
 
-        const { data, meta } = await prismaWithDefaultOptions.user.paginate({
+        const [data, meta] = await prismaWithDefaultOptions.user.paginate({
             cursor: true
         })
 
@@ -93,7 +93,7 @@ describe("Cursor", async () => {
             }
         })
 
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             cursor: {
                 setCursor(cursor) {
                     return { email: cursor }
@@ -138,7 +138,7 @@ describe("Cursor", async () => {
             })
         )
 
-        const { data, meta } = await prismaWithDefaultOptions.user.paginate({
+        const [data, meta] = await prismaWithDefaultOptions.user.paginate({
             cursor: {
                 limit: -1
             }
@@ -153,7 +153,7 @@ describe("Cursor", async () => {
 
     it("Should be able to return the typed data according to the arguments", async () => {
         const limit = 1
-        const { data } = await prisma.user.paginate({
+        const [data] = await prisma.user.paginate({
             cursor: {
                 limit: limit
             },
@@ -186,7 +186,7 @@ describe("Cursor", async () => {
 
     it("Should be able to use cursor-based pagination using the 'limit' parameter", async () => {
         const limit = Math.ceil(numberOfInserts / 3)
-        const { data } = await prisma.user.paginate({
+        const [data] = await prisma.user.paginate({
             cursor: {
                 limit: limit
             },
@@ -201,7 +201,7 @@ describe("Cursor", async () => {
 
     it("Should be able to use cursor to page through the first 'n' data", async () => {
         const limit = Math.ceil(numberOfInserts / 3)
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             cursor: {
                 limit: limit
             }
@@ -241,7 +241,7 @@ describe("Cursor", async () => {
             skip: 1
         })
 
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             cursor: {
                 after: cursor,
                 limit: limit
@@ -275,7 +275,7 @@ describe("Cursor", async () => {
             skip: 1
         })
 
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             cursor: {
                 before: cursor,
                 limit: limit
@@ -310,7 +310,7 @@ describe("Cursor", async () => {
             skip: 1
         })
 
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             cursor: {
                 after: cursor,
                 limit: limit
@@ -342,7 +342,7 @@ describe("Cursor", async () => {
             skip: 1
         })
 
-        const { data, meta } = await prisma.user.paginate({
+        const [data, meta] = await prisma.user.paginate({
             cursor: {
                 before: cursor,
                 limit: limit

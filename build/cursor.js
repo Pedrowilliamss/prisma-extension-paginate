@@ -46,15 +46,15 @@ async function cursor(model, args) {
         if (hasNextPage) {
             data.pop();
         }
-        return {
+        return [
             data,
-            meta: {
+            {
                 hasPreviousPage: previousPage.length === 1,
                 hasNextPage: hasNextPage,
                 startCursor: getCursor(data[0]),
                 endCursor: getCursor(data[data.length - 1])
             }
-        };
+        ];
     }
     if (before) {
         if (limit && limit !== -1) {
@@ -81,15 +81,15 @@ async function cursor(model, args) {
         if (hasPreviousPage) {
             data.shift();
         }
-        return {
+        return [
             data,
-            meta: {
+            {
                 hasPreviousPage: hasPreviousPage,
                 hasNextPage: nextPage.length === 1,
                 startCursor: getCursor(data[0]),
                 endCursor: getCursor(data[data.length - 1])
             }
-        };
+        ];
     }
     if (limit && limit > 0) {
         take = limit + 1;
@@ -104,13 +104,13 @@ async function cursor(model, args) {
     if (hasNextPage) {
         data.pop();
     }
-    return {
+    return [
         data,
-        meta: {
+        {
             hasPreviousPage: false,
             hasNextPage: hasNextPage,
             startCursor: getCursor(data[0]),
             endCursor: getCursor(data[data.length - 1])
         }
-    };
+    ];
 }

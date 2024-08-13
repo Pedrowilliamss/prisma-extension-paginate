@@ -35,10 +35,10 @@ async function offset(model, args) {
         }),
     ]);
     const meta = generateMetaPaginate({ totalCount, page, perPage, pageCount: data.length });
-    return {
+    return [
         data,
         meta
-    };
+    ];
 }
 function generateMetaPaginate({ page, pageCount, perPage, totalCount }) {
     perPage = perPage ?? totalCount;
