@@ -1,6 +1,4 @@
 import { Prisma } from "@prisma/client"
-import { offsetResult } from "./offset"
-import { cursorResult } from "./cursor"
 
 export type Exclusive<
   T extends Record<PropertyKey, unknown>,
@@ -45,3 +43,29 @@ export type cursorPaginateArgs<T> = findManyArgsOmited<T> & { cursor: cursorPagi
 export type offsetPaginateArgs<T> = findManyArgsOmited<T> & { offset: offsetPaginate }
 
 export type findManyResult<T, A> = Prisma.Result<T, A, "findMany">
+
+export type cursorMeta = {
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+  startCursor: string | number
+  endCursor: string | number
+}
+
+export type cursorResult<T, A> = {
+  data: findManyResult<T, A>
+  meta: cursorMeta
+}
+
+export type offsetMeta = {
+  totalCount: number
+  pageCount: number
+  totalPages: number
+  currentPage: number
+  previousPage: number | null
+  nextPage: number | null
+}
+
+export type offsetResult<T, A> = {
+  data: findManyResult<T, A>
+  meta: offsetMeta
+}

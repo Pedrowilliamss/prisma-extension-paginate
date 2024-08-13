@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client"
-import { cursorPaginateArgs, findManyResult } from "./types"
+import { cursorPaginateArgs, cursorResult, findManyResult } from "./types"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
 
 export async function cursor<T, A extends cursorPaginateArgs<T>>(
@@ -134,16 +134,4 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
             endCursor: getCursor(data[data.length - 1])
         }
     }
-}
-
-type cursorMeta = {
-    hasPreviousPage: boolean
-    hasNextPage: boolean
-    startCursor: string | number
-    endCursor: string | number
-}
-
-export type cursorResult<T, A> = {
-    data: findManyResult<T, A>
-    meta: cursorMeta
 }

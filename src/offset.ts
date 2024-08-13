@@ -1,20 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
-import { findManyResult, offsetPaginateArgs, paginateArgs } from "./types"
-
-type offsetMeta = {
-    totalCount: number
-    pageCount: number
-    totalPages: number
-    currentPage: number
-    previousPage: number | null
-    nextPage: number | null
-}
-
-export type offsetResult<T, A> = {
-    data: findManyResult<T, A>
-    meta: offsetMeta
-}
+import { offsetMeta, offsetPaginateArgs, offsetResult } from "./types"
 
 export async function offset<T, A extends offsetPaginateArgs<T>>(
     model: T,
