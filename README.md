@@ -239,7 +239,7 @@ const [ data, meta ] = await prisma.user.paginate({
 */
 ```
 
-**Load precious page**
+**Load previous page**
 ``` ts
 const [ data, meta ] = await prisma.user.paginate({
     cursor: {
