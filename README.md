@@ -5,7 +5,7 @@
 # 📚 Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
-  - [Quick Starte](#quick-Start)
+  - [Quick Start](#quick-start)
   - [Offset Pagination](#offset-pagination)
   - [Cursor-based Pagination](#cursor-based-pagination)
 - [Docs](#docs)
