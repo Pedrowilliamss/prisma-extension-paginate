@@ -1,2 +1,2 @@
-import { offsetPaginateArgs, offsetResult } from "./types";
-export declare function offset<T, A extends offsetPaginateArgs<T>>(model: T, args: A): Promise<offsetResult<T, A>>;
+import { OffsetPaginateArgs, OffsetResult } from "./types";
+export declare function offset<T, A extends OffsetPaginateArgs<T>>(model: T, args: A): Promise<OffsetResult<T, A>>;

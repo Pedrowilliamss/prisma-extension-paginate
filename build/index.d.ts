@@ -1,4 +1,4 @@
-import { paginateArgs, PaginateOptions, PaginateResult } from "./types";
+import { PaginateArgs, PaginateOptions, PaginateResult } from "./types";
 declare const _default: (options?: Partial<PaginateOptions>) => (client: any) => {
     $extends: {
         extArgs: {
@@ -20,4 +20,4 @@ declare const _default: (options?: Partial<PaginateOptions>) => (client: any) =>
     };
 };
 export default _default;
-declare function paginate<T, A extends paginateArgs<T>>(this: T, args: A): Promise<PaginateResult<T, A>>;
+declare function paginate<T, A extends PaginateArgs<T>>(this: T, args: A): Promise<PaginateResult<T, A>>;

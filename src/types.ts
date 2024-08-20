@@ -7,14 +7,14 @@ export type Exclusive<
   | (T & { [k in Exclude<keyof U, keyof T>]?: never })
   | (U & { [k in Exclude<keyof T, keyof U>]?: never })
 
-export type findManyArgsOmited<T> = Omit<Prisma.Args<T, "findMany">, "skip" | "take" | "cursor">
+export type FindManyArgsOmited<T> = Omit<Prisma.Args<T, "findMany">, "skip" | "take" | "cursor">
 
-type offsetPaginate = {
+type OffsetPaginate = {
   page?: number
   perPage?: number
 }
 
-export type cursorPaginate = {
+export type CursorPaginate = {
   limit?: number
   setCursor?: SetCursor
   getCursor?: GetCursor
@@ -34,29 +34,29 @@ export interface PaginateOptions {
 type SetCursor = (cursor: string | number) => unknown
 type GetCursor = (target: unknown) => string | number
 
-export type PaginateResult<T, A> = A extends { cursor: cursorPaginate } ? cursorResult<T, A> : offsetResult<T, A>
+export type PaginateResult<T, A> = A extends { cursor: CursorPaginate } ? CursorResult<T, A> : OffsetResult<T, A>
 
-export type paginateArgs<T> = findManyArgsOmited<T> & Exclusive<{ offset: offsetPaginate | true }, { cursor: cursorPaginate | true }>
+export type PaginateArgs<T> = FindManyArgsOmited<T> & Exclusive<{ offset: OffsetPaginate | true }, { cursor: CursorPaginate | true }>
 
-export type cursorPaginateArgs<T> = findManyArgsOmited<T> & { cursor: cursorPaginate }
+export type CursorPaginateArgs<T> = FindManyArgsOmited<T> & { cursor: CursorPaginate }
 
-export type offsetPaginateArgs<T> = findManyArgsOmited<T> & { offset: offsetPaginate }
+export type OffsetPaginateArgs<T> = FindManyArgsOmited<T> & { offset: OffsetPaginate }
 
-export type findManyResult<T, A> = Prisma.Result<T, A, "findMany">
+export type FindManyResult<T, A> = Prisma.Result<T, A, "findMany">
 
-export type cursorMeta = {
+export type CursorMeta = {
   hasPreviousPage: boolean
   hasNextPage: boolean
-  startCursor: string | number
-  endCursor: string | number
+  startCursor: string | number | null
+  endCursor: string | number | null
 }
 
-export type cursorResult<T, A> = [
-  data: findManyResult<T, A>,
-  meta: cursorMeta
+export type CursorResult<T, A> = [
+  data: FindManyResult<T, A>,
+  meta: CursorMeta
 ]
 
-export type offsetMeta = {
+export type OffsetMeta = {
   totalCount: number
   pageCount: number
   totalPages: number
@@ -65,7 +65,7 @@ export type offsetMeta = {
   nextPage: number | null
 }
 
-export type offsetResult<T, A> = [
-  data: findManyResult<T, A>,
-  meta: offsetMeta
+export type OffsetResult<T, A> = [
+  data: FindManyResult<T, A>,
+  meta: OffsetMeta
 ]

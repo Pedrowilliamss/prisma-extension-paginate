@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client"
-import { cursorPaginateArgs, offsetPaginateArgs, paginateArgs, PaginateOptions, PaginateResult } from "./types"
+import { CursorPaginateArgs, OffsetPaginateArgs, PaginateArgs, PaginateOptions, PaginateResult } from "./types"
 import { offset } from "./offset"
 import { cursor } from "./cursor"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
@@ -20,7 +20,7 @@ export default (options?: Partial<PaginateOptions>) => {
     })
 }
 
-async function paginate<T, A extends paginateArgs<T>>(
+async function paginate<T, A extends PaginateArgs<T>>(
     this: T,
     args: A,
 ): Promise<PaginateResult<T, A>> {
@@ -30,7 +30,7 @@ async function paginate<T, A extends paginateArgs<T>>(
         }
 
         args.offset.perPage = args.offset?.perPage ?? defaultArgs?.offset?.perPage
-        return offset(this, args as offsetPaginateArgs<T>) as unknown as PaginateResult<T, A>
+        return offset(this, args as OffsetPaginateArgs<T>) as unknown as PaginateResult<T, A>
     }
 
     if ("cursor" in args) {
@@ -42,7 +42,7 @@ async function paginate<T, A extends paginateArgs<T>>(
         args.cursor.getCursor = args.cursor.getCursor ?? defaultArgs?.cursor?.getCursor
         args.cursor.setCursor = args.cursor.setCursor ?? defaultArgs?.cursor?.setCursor
 
-        return cursor(this, args as cursorPaginateArgs<T>) as unknown as PaginateResult<T, A>
+        return cursor(this, args as CursorPaginateArgs<T>) as unknown as PaginateResult<T, A>
     }
 
     const clientVersion = Prisma.prismaVersion.client

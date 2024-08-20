@@ -7,6 +7,7 @@ import { LIMIT } from "../lib/constants"
 import { prisma } from "../lib/prisma"
 import { User, PrismaClient } from "@prisma/client"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
+import { CursorMeta } from "../types"
 
 let numberOfInserts = randomInt(5, 37)
 
@@ -21,7 +22,7 @@ describe("Cursor", async () => {
 
     it("Should be able to use cursor-based pagination", async () => {
         const [data] = await prisma.user.paginate({
-            cursor: {}
+            cursor: true
         })
 
         const target = data[0]
@@ -47,8 +48,8 @@ describe("Cursor", async () => {
         expectTypeOf(meta).toEqualTypeOf<{
             hasPreviousPage: boolean,
             hasNextPage: boolean,
-            startCursor: string | number,
-            endCursor: string | number
+            startCursor: string | number | null,
+            endCursor: string | number | null
         }>()
 
         expect(meta).toHaveProperty('startCursor')
@@ -366,5 +367,23 @@ describe("Cursor", async () => {
                 before: 3
             }
         })).rejects.toBeInstanceOf(PrismaClientValidationError)
+    })
+
+    it("Should be able to pagination on empty tables", async () => {
+        const invalidId = -1
+        const [data, meta] = await prisma.user.paginate({
+            where: {
+                id: invalidId
+            },
+            cursor: true
+        })
+
+        expect(data).toHaveLength(0)
+        expect(meta).toEqual<CursorMeta>({
+            endCursor: null,
+            startCursor: null,
+            hasNextPage: false,
+            hasPreviousPage: false
+        })
     })
 })

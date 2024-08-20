@@ -21,8 +21,9 @@ async function cursor(model, args) {
         throw new library_1.PrismaClientValidationError(`Unable to use cursor-based pagination with 'after' and 'before' specified at the same time`, { clientVersion });
     }
     let take;
+    const isLimitDefined = limit && limit >= 0;
     if (after) {
-        if (limit && limit !== -1) {
+        if (isLimitDefined) {
             take = limit + 1;
         }
         let [data, previousPage] = await Promise.all([
@@ -42,6 +43,18 @@ async function cursor(model, args) {
                 skip: 1
             }),
         ]);
+        const isDataEmpty = data.length === 0;
+        if (isDataEmpty) {
+            return [
+                data,
+                {
+                    endCursor: null,
+                    startCursor: null,
+                    hasNextPage: false,
+                    hasPreviousPage: false
+                }
+            ];
+        }
         let hasNextPage = limit !== undefined && data.length > limit;
         if (hasNextPage) {
             data.pop();
@@ -57,7 +70,7 @@ async function cursor(model, args) {
         ];
     }
     if (before) {
-        if (limit && limit !== -1) {
+        if (isLimitDefined) {
             take = -limit - 1;
         }
         let [data, nextPage] = await Promise.all([
@@ -77,6 +90,18 @@ async function cursor(model, args) {
                 skip: 1
             }),
         ]);
+        const isDataEmpty = data.length === 0;
+        if (isDataEmpty) {
+            return [
+                data,
+                {
+                    endCursor: null,
+                    startCursor: null,
+                    hasNextPage: false,
+                    hasPreviousPage: false
+                }
+            ];
+        }
         let hasPreviousPage = limit !== undefined && data.length > limit;
         if (hasPreviousPage) {
             data.shift();
@@ -91,15 +116,25 @@ async function cursor(model, args) {
             }
         ];
     }
-    if (limit && limit > 0) {
+    if (isLimitDefined) {
         take = limit + 1;
     }
-    let [data] = await Promise.all([
-        context.findMany({
-            ...findManyOptions,
-            take: take,
-        }),
-    ]);
+    let data = await context.findMany({
+        ...findManyOptions,
+        take: take,
+    });
+    const isDataEmpty = data.length === 0;
+    if (isDataEmpty) {
+        return [
+            data,
+            {
+                endCursor: null,
+                startCursor: null,
+                hasNextPage: false,
+                hasPreviousPage: false
+            }
+        ];
+    }
     let hasNextPage = limit > 0 && data.length > limit;
     if (hasNextPage) {
         data.pop();

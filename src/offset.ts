@@ -1,11 +1,11 @@
 import { Prisma } from "@prisma/client"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
-import { offsetMeta, offsetPaginateArgs, offsetResult } from "./types"
+import { OffsetMeta, OffsetPaginateArgs, OffsetResult } from "./types"
 
-export async function offset<T, A extends offsetPaginateArgs<T>>(
+export async function offset<T, A extends OffsetPaginateArgs<T>>(
     model: T,
     args: A,
-): Promise<offsetResult<T, A>> {
+): Promise<OffsetResult<T, A>> {
     const context = Prisma.getExtensionContext(model)
     const { offset, ...findManyOptions } = args
 
@@ -61,14 +61,7 @@ export async function offset<T, A extends offsetPaginateArgs<T>>(
     ]
 }
 
-type generateMetaPaginateParams = {
-    totalCount: number
-    perPage?: number
-    page?: number,
-    pageCount: number
-}
-
-function generateMetaPaginate({ page, pageCount, perPage, totalCount }: generateMetaPaginateParams): offsetMeta {
+function generateMetaPaginate({ page, pageCount, perPage, totalCount }: GenerateMetaPaginateParams): OffsetMeta {
     perPage = perPage ?? totalCount
     let totalPages = Math.ceil(totalCount / perPage) || 1
     const currentPage = Math.min(page ?? 1, totalPages)
@@ -83,4 +76,11 @@ function generateMetaPaginate({ page, pageCount, perPage, totalCount }: generate
         previousPage,
         nextPage
     }
+}
+
+type GenerateMetaPaginateParams = {
+    totalCount: number
+    perPage?: number
+    page?: number,
+    pageCount: number
 }

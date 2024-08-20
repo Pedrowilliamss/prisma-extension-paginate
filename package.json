@@ -1,6 +1,6 @@
 {
   "name": "prisma-extension-paginate",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "description": "Prisma extension used to paginate queries performed by the Prisma client",
   "main": "build/index.js",
   "types": "build/index.d.js",

@@ -1,11 +1,11 @@
 import { Prisma } from "@prisma/client"
-import { cursorPaginateArgs, cursorResult, findManyResult } from "./types"
+import { CursorPaginateArgs, CursorResult, FindManyResult } from "./types"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
 
-export async function cursor<T, A extends cursorPaginateArgs<T>>(
+export async function cursor<T, A extends CursorPaginateArgs<T>>(
     model: T,
     args: A
-): Promise<cursorResult<T, A>> {
+): Promise<CursorResult<T, A>> {
     const context = Prisma.getExtensionContext(model)
     let { cursor, ...findManyOptions } = args
     const {
@@ -24,6 +24,7 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
             throw new Error("The query must return an 'id' field to perform the cursor conversion.")
         }
     } = cursor
+
     if (after && before) {
         const clientVersion = Prisma.prismaVersion.client
         throw new PrismaClientValidationError(
@@ -32,11 +33,13 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
         )
     }
     let take
+    const isLimitDefined = limit && limit >= 0
 
     if (after) {
-        if (limit && limit !== -1) {
+        if (isLimitDefined) {
             take = limit + 1
         }
+
         let [data, previousPage] = await Promise.all([
             (context as any).findMany({
                 ...findManyOptions,
@@ -55,11 +58,23 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
             }),
         ])
 
+        const isDataEmpty = data.length === 0
+        if (isDataEmpty) {
+            return [
+                data,
+                {
+                    endCursor: null,
+                    startCursor: null,
+                    hasNextPage: false,
+                    hasPreviousPage: false
+                }
+            ]
+        }
+
         let hasNextPage = limit !== undefined && data.length > limit
         if (hasNextPage) {
             data.pop()
         }
-
 
         return [
             data,
@@ -73,7 +88,7 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
     }
 
     if (before) {
-        if (limit && limit !== -1) {
+        if (isLimitDefined) {
             take = -limit - 1
         }
 
@@ -95,6 +110,19 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
             }),
         ])
 
+        const isDataEmpty = data.length === 0
+        if (isDataEmpty) {
+            return [
+                data,
+                {
+                    endCursor: null,
+                    startCursor: null,
+                    hasNextPage: false,
+                    hasPreviousPage: false
+                }
+            ]
+        }
+
         let hasPreviousPage = limit !== undefined && data.length > limit
         if (hasPreviousPage) {
             data.shift()
@@ -111,15 +139,27 @@ export async function cursor<T, A extends cursorPaginateArgs<T>>(
         ]
     }
 
-    if (limit && limit > 0) {
+    if (isLimitDefined) {
         take = limit + 1
     }
-    let [data] = await Promise.all([
-        (context as any).findMany({
-            ...findManyOptions,
-            take: take,
-        }),
-    ])
+
+    let data = await (context as any).findMany({
+        ...findManyOptions,
+        take: take,
+    })
+
+    const isDataEmpty = data.length === 0
+    if (isDataEmpty) {
+        return [
+            data,
+            {
+                endCursor: null,
+                startCursor: null,
+                hasNextPage: false,
+                hasPreviousPage: false
+            }
+        ]
+    }
 
     let hasNextPage = limit! > 0 && data.length > limit!
     if (hasNextPage) {
