@@ -1,6 +1,6 @@
 {
 	"name": "prisma-extension-paginate",
-	"version": "1.0.7",
+	"version": "1.0.9",
 	"description": "Prisma extension used to paginate queries performed by the Prisma client",
 	"main": "build/index.js",
 	"types": "build/index.d.js",
@@ -28,8 +28,11 @@
 		"url": "https://github.com/Pedrowilliamss/prisma-extension-paginate/issues"
 	},
 	"homepage": "https://github.com/Pedrowilliamss/prisma-extension-paginate#readme",
+	"peerDependencies": {
+		"@prisma/client": "^6.10.1"
+	},
 	"devDependencies": {
-		"@prisma/client": "^5.18.0",
+		"@prisma/client": "^6.10.1",
 		"@types/node": "^22.0.0",
 		"@vitest/coverage-v8": "^2.0.5",
 		"prisma": "^6.10.1",
