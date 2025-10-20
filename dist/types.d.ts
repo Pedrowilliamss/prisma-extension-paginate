@@ -3,6 +3,7 @@ export type PrismaNamespace = {
     defineExtension: (typeof Prisma)['defineExtension'];
     prismaVersion: (typeof Prisma)['prismaVersion'];
     PrismaClientValidationError: (typeof Prisma)['PrismaClientValidationError'];
+    getExtensionContext: (typeof Prisma)["getExtensionContext"];
 };
 export type Exclusive<T extends Record<PropertyKey, unknown>, U extends Record<PropertyKey, unknown>> = (T & {
     [k in Exclude<keyof U, keyof T>]?: never;

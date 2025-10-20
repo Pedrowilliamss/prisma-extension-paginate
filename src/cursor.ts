@@ -1,6 +1,5 @@
-import { Prisma } from "@prisma/client"
-import { CursorPaginateArgs, CursorResult, FindManyResult } from "./types"
-import { PrismaClientValidationError } from "@prisma/client/runtime/library"
+import { Prisma } from "./index"
+import { CursorPaginateArgs, CursorResult } from "./types"
 
 export async function cursor<T, A extends CursorPaginateArgs<T>>(
 	model: T,
@@ -27,7 +26,7 @@ export async function cursor<T, A extends CursorPaginateArgs<T>>(
 
 	if (after && before) {
 		const clientVersion = Prisma.prismaVersion.client
-		throw new PrismaClientValidationError(
+		throw new Prisma.PrismaClientValidationError(
 			`Unable to use cursor-based pagination with 'after' and 'before' specified at the same time`,
 			{ clientVersion }
 		)

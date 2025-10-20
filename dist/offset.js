@@ -1,23 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.offset = offset;
-const client_1 = require("@prisma/client");
-const library_1 = require("@prisma/client/runtime/library");
+const index_1 = require("./index");
 async function offset(model, args) {
-    const context = client_1.Prisma.getExtensionContext(model);
+    const context = index_1.Prisma.getExtensionContext(model);
     const { offset, ...findManyOptions } = args;
     let { page = 1, perPage } = offset;
     if (typeof page !== "number") {
-        const clientVersion = client_1.Prisma.prismaVersion.client;
-        throw new library_1.PrismaClientValidationError(`Argument page: Invalid value provided. Expected Int, provided ${typeof page}`, { clientVersion });
+        const clientVersion = index_1.Prisma.prismaVersion.client;
+        throw new index_1.Prisma.PrismaClientValidationError(`Argument page: Invalid value provided. Expected Int, provided ${typeof page}`, { clientVersion });
     }
     if (perPage !== undefined && typeof perPage !== "number") {
-        const clientVersion = client_1.Prisma.prismaVersion.client;
-        throw new library_1.PrismaClientValidationError(`Argument perPage: Invalid value provided. Expected Int, provided ${typeof perPage}`, { clientVersion });
+        const clientVersion = index_1.Prisma.prismaVersion.client;
+        throw new index_1.Prisma.PrismaClientValidationError(`Argument perPage: Invalid value provided. Expected Int, provided ${typeof perPage}`, { clientVersion });
     }
     if (perPage && perPage > Number.MAX_SAFE_INTEGER) {
-        const clientVersion = client_1.Prisma.prismaVersion.client;
-        throw new library_1.PrismaClientValidationError(`Unable to fit value 1e+21 into a 64-bit signed integer for field \`perPage\``, { clientVersion });
+        const clientVersion = index_1.Prisma.prismaVersion.client;
+        throw new index_1.Prisma.PrismaClientValidationError(`Unable to fit value 1e+21 into a 64-bit signed integer for field \`perPage\``, { clientVersion });
     }
     let data, totalCount, skip, take;
     if (perPage && perPage !== -1) {

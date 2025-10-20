@@ -1,5 +1,4 @@
-import { Prisma } from "@prisma/client"
-import { PrismaClientValidationError } from "@prisma/client/runtime/library"
+import { Prisma } from "./index"
 import { OffsetMeta, OffsetPaginateArgs, OffsetResult } from "./types"
 
 export async function offset<T, A extends OffsetPaginateArgs<T>>(
@@ -13,7 +12,7 @@ export async function offset<T, A extends OffsetPaginateArgs<T>>(
 
     if (typeof page !== "number") {
         const clientVersion = Prisma.prismaVersion.client
-        throw new PrismaClientValidationError(
+        throw new Prisma.PrismaClientValidationError(
             `Argument page: Invalid value provided. Expected Int, provided ${typeof page}`,
             { clientVersion }
         )
@@ -21,7 +20,7 @@ export async function offset<T, A extends OffsetPaginateArgs<T>>(
 
     if (perPage !== undefined && typeof perPage !== "number") {
         const clientVersion = Prisma.prismaVersion.client
-        throw new PrismaClientValidationError(
+        throw new Prisma.PrismaClientValidationError(
             `Argument perPage: Invalid value provided. Expected Int, provided ${typeof perPage}`,
             { clientVersion }
         )
@@ -29,7 +28,7 @@ export async function offset<T, A extends OffsetPaginateArgs<T>>(
 
     if (perPage && perPage > Number.MAX_SAFE_INTEGER) {
         const clientVersion = Prisma.prismaVersion.client
-        throw new PrismaClientValidationError(
+        throw new Prisma.PrismaClientValidationError(
             `Unable to fit value 1e+21 into a 64-bit signed integer for field \`perPage\``,
             { clientVersion }
         )

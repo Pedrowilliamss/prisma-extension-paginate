@@ -1,10 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cursor = cursor;
-const client_1 = require("@prisma/client");
-const library_1 = require("@prisma/client/runtime/library");
+const index_1 = require("./index");
 async function cursor(model, args) {
-    const context = client_1.Prisma.getExtensionContext(model);
+    const context = index_1.Prisma.getExtensionContext(model);
     let { cursor, ...findManyOptions } = args;
     const { after, before, limit, setCursor = (cursor) => {
         return {
@@ -17,8 +16,8 @@ async function cursor(model, args) {
         throw new Error("The query must return an 'id' field to perform the cursor conversion.");
     } } = cursor;
     if (after && before) {
-        const clientVersion = client_1.Prisma.prismaVersion.client;
-        throw new library_1.PrismaClientValidationError(`Unable to use cursor-based pagination with 'after' and 'before' specified at the same time`, { clientVersion });
+        const clientVersion = index_1.Prisma.prismaVersion.client;
+        throw new index_1.Prisma.PrismaClientValidationError(`Unable to use cursor-based pagination with 'after' and 'before' specified at the same time`, { clientVersion });
     }
     let take;
     const isLimitDefined = limit && limit >= 0;

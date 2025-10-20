@@ -1,17 +1,18 @@
 import { PaginateArgs, PaginateOptions, PaginateResult, PrismaNamespace } from "./types";
-export declare function createPagianteExtension(prisma: PrismaNamespace, options?: Partial<PaginateOptions>): (client: any) => {
+export declare let Prisma: PrismaNamespace;
+export declare function createPaginateExtension(prisma: PrismaNamespace, options?: Partial<PaginateOptions>): (client: any) => {
     $extends: {
         extArgs: {
             result: {};
             model: {
                 $allModels: {
-                    paginate: () => <T, A extends PaginateArgs<T>>(this: T, args: A) => Promise<PaginateResult<T, A>>;
+                    paginate: () => typeof paginate;
                 };
                 user: {
-                    paginate: () => <T, A extends PaginateArgs<T>>(this: T, args: A) => Promise<PaginateResult<T, A>>;
+                    paginate: () => typeof paginate;
                 };
                 post: {
-                    paginate: () => <T, A extends PaginateArgs<T>>(this: T, args: A) => Promise<PaginateResult<T, A>>;
+                    paginate: () => typeof paginate;
                 };
             };
             query: {};
@@ -19,4 +20,6 @@ export declare function createPagianteExtension(prisma: PrismaNamespace, options
         };
     };
 };
+declare function paginate<T, A extends PaginateArgs<T>>(this: T, args: A): Promise<PaginateResult<T, A>>;
+export {};
 //# sourceMappingURL=index.d.ts.map
