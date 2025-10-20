@@ -40,7 +40,7 @@ async function cursor(model, args) {
                 omit: undefined,
                 cursor: setCursor(after),
                 take: -1,
-                skip: 1
+                skip: limit === 1 ? 0 : 1
             }),
         ]);
         const isDataEmpty = data.length === 0;
