@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it } from "vitest"
 import setup from "./utils/setup-tests"
 import teardown from "./utils/teardown-tests"
-import prismaPaginateExtension from "../index"
+import { createPaginateExtension } from "../index"
 import { PER_PAGE } from "../lib/constants"
 import { prisma } from "../lib/prisma"
-import { Post, PrismaClient, User } from "@prisma/client"
+import { Post, Prisma, PrismaClient, User } from "@prisma/client"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
 import { randomInt } from "crypto"
 
@@ -121,7 +121,9 @@ describe("Offset", async () => {
 
     it("Should be able to return all data if `offsert.perPage` is -1, even if there is a default value", async () => {
         const prismaWithDefaultOptions = new PrismaClient().$extends(
-            prismaPaginateExtension({
+            createPaginateExtension(
+                Prisma,
+                {
                 offset: {
                     perPage: PER_PAGE
                 }
@@ -139,7 +141,7 @@ describe("Offset", async () => {
 
     it("Should be able to return all data if `offsert.perPage` is undefined and does not have a default value", async () => {
         const prismaWithoutDefaultOptions = new PrismaClient().$extends(
-            prismaPaginateExtension()
+            createPaginateExtension(Prisma)
         )
         const [data] = await prismaWithoutDefaultOptions.user.paginate({
             offset: {}
@@ -203,11 +205,14 @@ describe("Offset", async () => {
 
     it("Should be able to use the default options", async () => {
         const prismaWithDefaultOptions = new PrismaClient().$extends(
-            prismaPaginateExtension({
-                offset: {
-                    perPage: PER_PAGE
+            createPaginateExtension(
+                Prisma,
+                {
+                    offset: {
+                        perPage: PER_PAGE
+                    }
                 }
-            })
+            )
         )
         const [data, meta] = await prismaWithDefaultOptions.user.paginate({
             offset: {}

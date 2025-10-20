@@ -149,3 +149,4 @@ async function cursor(model, args) {
         }
     ];
 }
+//# sourceMappingURL=cursor.js.map

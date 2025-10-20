@@ -1,6 +1,8 @@
-import { PrismaClient } from "@prisma/client";
-import paginate from "../index"
+import { Prisma, PrismaClient } from "@prisma/client";
+import { createPaginateExtension } from "../index"
+
+const extension = createPaginateExtension(Prisma)
 
 export const prisma = new PrismaClient().$extends(
-    paginate()
+    extension
 );

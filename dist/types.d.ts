@@ -1,4 +1,9 @@
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+export type PrismaNamespace = {
+    defineExtension: (typeof Prisma)['defineExtension'];
+    prismaVersion: (typeof Prisma)['prismaVersion'];
+    PrismaClientValidationError: (typeof Prisma)['PrismaClientValidationError'];
+};
 export type Exclusive<T extends Record<PropertyKey, unknown>, U extends Record<PropertyKey, unknown>> = (T & {
     [k in Exclude<keyof U, keyof T>]?: never;
 }) | (U & {
@@ -68,3 +73,4 @@ export type OffsetResult<T, A> = [
     meta: OffsetMeta
 ];
 export {};
+//# sourceMappingURL=types.d.ts.map

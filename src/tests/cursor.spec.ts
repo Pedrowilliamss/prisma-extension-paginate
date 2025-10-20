@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it } from "vitest"
 import setup from "./utils/setup-tests"
 import teardown from "./utils/teardown-tests"
-import prismaPaginateExtension from "../index"
+import { createPaginateExtension } from "../index"
 import { randomInt } from "crypto"
 import { LIMIT } from "../lib/constants"
 import { prisma } from "../lib/prisma"
-import { User, PrismaClient } from "@prisma/client"
+import { User, PrismaClient, Prisma } from "@prisma/client"
 import { PrismaClientValidationError } from "@prisma/client/runtime/library"
 import { CursorMeta } from "../types"
 
@@ -60,7 +60,9 @@ describe("Cursor", async () => {
 
 	it("Should be able use default options", async () => {
 		const prismaWithDefaultOptions = new PrismaClient().$extends(
-			prismaPaginateExtension({
+			createPaginateExtension(
+				Prisma,
+				{
 				cursor: {
 					limit: LIMIT,
 					getCursor: (target) => { return (target as any).id },
@@ -132,11 +134,14 @@ describe("Cursor", async () => {
 
 	it("Should be able to return all data if `offsert.perPage` is -1, even if there is a default value", async () => {
 		const prismaWithDefaultOptions = new PrismaClient().$extends(
-			prismaPaginateExtension({
-				cursor: {
-					limit: LIMIT
+			createPaginateExtension(
+				Prisma,
+				{
+					cursor: {
+						limit: LIMIT
+					}
 				}
-			})
+			)
 		)
 
 		const [data, meta] = await prismaWithDefaultOptions.user.paginate({

@@ -55,3 +55,4 @@ function generateMetaPaginate({ page, pageCount, perPage, totalCount }) {
         nextPage
     };
 }
+//# sourceMappingURL=offset.js.map
