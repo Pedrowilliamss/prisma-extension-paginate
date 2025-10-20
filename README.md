@@ -19,13 +19,16 @@ To install the extension, run the following command:
 ```bash
 npm install prisma-extension-paginate
 ```
+
 Add to prisma client
 ``` ts
-import { PrismaClient } from "@prisma/client";
-import paginate from "prisma-extension-paginate";
+import { PrismaClient, Prisma } from "@prisma/client";
+import { createPaginateExtension } from "prisma-extension-paginate";
+
+const extension = createPaginateExtension(Prisma)
 
 const prisma = new PrismaClient().$extends(
-    paginate()
+    extension
 );
 ```
 
